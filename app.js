@@ -19,11 +19,21 @@ app.use('/api/v1/auth', authRouter); // use authRoute
 
 // if no route found - default error
 app.use('*', (req, res) => {
+  throw new Error('ERROR! Route not found');
   res.status(404).json({
     status: 'error',
     message: 'Route not found'
   });
 }); // 404 route
+
+// global error handler
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({
+    status: 'error',
+    message: err.message
+  });
+})
 
 const PORT = process.env.APP_PORT || 4000; // set port
 
