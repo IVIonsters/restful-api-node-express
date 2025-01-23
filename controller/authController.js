@@ -1,6 +1,8 @@
 const user = require('../db/models/user');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+const catchErrors = require('../utils/catchErrors');
+const displayError = require('../utils/displayError');
 
 const generateToken = (payload) => {
   return jwt.sign(payload, process.env.JWT_SECRET, {
@@ -9,20 +11,12 @@ const generateToken = (payload) => {
 };
 
 // signup controller
-const signup = async (req, res, next) => {
+const signup = catchErrors(async (req, res, next) => {
   const body = req.body;
 
-  // debugging parse issue
-  // console.log('Received headers:', req.headers);
-  // console.log('Received raw body:', req.rawBody); 
-  // console.log('Received body:', body); 
-
   if (!['1', '2'].includes(body.userType)) {
-    return res.status(400).json({
-      status: 'error',
-      message: 'Invalid user type'
-    });
-  }
+    throw new displayError('Invalid user type', 400);
+  };
 
   const newUser = await user.create({
     userType: body.userType,
@@ -34,6 +28,10 @@ const signup = async (req, res, next) => {
     confirmPassword: body.confirmPassword
   });
 
+  if (!newUser) {
+    return next(new displayError('User not created', 500));
+  }
+
   const result = newUser.toJSON();
 
   // remove password and deletedAt from the response
@@ -44,38 +42,26 @@ const signup = async (req, res, next) => {
     id: result.id,
   });
 
-  if (!result) {
-    return res.status(400).json({
-      status: 'Failed!',
-      message: 'Failed to create user'
-    });
-  }
   return res.status(201).json({
     status: 'success',
     message: 'User created successfully',
     data: result,
   });
-};
+});
 
 // login controller
-const login = async (req, res, next) => {
+const login = catchErrors(async (req, res, next) => {
   // login logic
   const { email, password } = req.body;
 
   if (!email || !password) {
-    return res.status(400).json({
-      status: 'error',
-      message: 'Please provide email and password'
-    });
+    return next(new displayError('Email and password are required', 400));
   }
 
   // find user by email and compare password
   const result = await user.findOne({ where: { email } });
   if (!result || !(await bcrypt.compare(password, result.password))) {
-    return res.status(401).json({
-      status: 'error',
-      message: 'Invalid email or password'
-    });
+    return next(new displayError('Invalid email or password', 401));
   }
   // generate token
   const token = generateToken({
@@ -87,6 +73,6 @@ const login = async (req, res, next) => {
     message: 'User logged in successfully',
     token,
   });
-};
+});
 
 module.exports = { signup, login };
