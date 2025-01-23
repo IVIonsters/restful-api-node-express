@@ -2,6 +2,7 @@
 const { Sequelize, Model, DataTypes } = require('sequelize');
 const bcrypt = require('bcrypt');
 const sequelize = require('../../config/database');
+const displayError = require('../../utils/displayError');
 
 module.exports = sequelize.define('user', {
   id: {
@@ -33,7 +34,9 @@ module.exports = sequelize.define('user', {
         const hashPassword = bcrypt.hashSync(value, 10);
         this.setDataValue('password', hashPassword);
       } else {
-        throw new Error('Password confirmation does not match password');
+        throw new displayError('Password confirmation does not match password',
+          400
+        );
       }
     }
   },
