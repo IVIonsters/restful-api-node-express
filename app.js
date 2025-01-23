@@ -3,6 +3,7 @@ const express = require('express');
 const authRouter = require('./route/authRoute'); // import authRoute
 const catchErrors = require('./utils/catchErrors');
 const displayError = require('./utils/displayError');
+const globalErrorHandler = require('./controller/errorController');
 
 const app = express();
 
@@ -26,15 +27,7 @@ app.use('*',
   })); // 404 route
 
 // global error handler
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(err.statusCode).json({
-    status: err.status,
-    message: err.message,
-    // cannot display stack trace in production mode
-    stack: err.stack,
-  });
-})
+app.use(globalErrorHandler);
 
 const PORT = process.env.APP_PORT || 4000; // set port
 
