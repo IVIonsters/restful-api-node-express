@@ -2,6 +2,7 @@ require('dotenv').config({ path: `${process.cwd()}/.env` }); // import dotenv
 const express = require('express');
 const authRouter = require('./route/authRoute'); // import authRoute
 const catchErrors = require('./utils/catchErrors');
+const displayError = require('./utils/displayError');
 
 const app = express();
 
@@ -21,15 +22,17 @@ app.use('/api/v1/auth', authRouter); // use authRoute
 // if no route found - default error
 app.use('*',
   catchErrors(async (req, res, next) => {
-    throw new Error('Error! Route not found');
+    throw new displayError('Error! Route not found', 404);
   })); // 404 route
 
 // global error handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).json({
-    status: 'error',
-    message: err.message
+  res.status(err.statusCode).json({
+    status: err.status,
+    message: err.message,
+    // cannot display stack trace in production mode
+    stack: err.stack,
   });
 })
 
