@@ -1,6 +1,7 @@
 require('dotenv').config({ path: `${process.cwd()}/.env` }); // import dotenv
 const express = require('express');
 const authRouter = require('./route/authRoute'); // import authRoute
+const projectRouter = require('./route/projectRoute'); // import projectRoute
 const catchErrors = require('./utils/catchErrors');
 const displayError = require('./utils/displayError');
 const globalErrorHandler = require('./controller/errorController');
@@ -11,6 +12,7 @@ app.use(express.json()); // parse json body
 
 // all routes will here
 app.use('/api/v1/auth', authRouter); // use authRoute
+app.use('/api/v1/projects', projectRouter); // use projectRoute
 
 // if no route found - default error
 app.use('*',
