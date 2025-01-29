@@ -3,9 +3,9 @@ const catchErrors = require('../utils/catchErrors'); // Import catchErrors
 
 const createProject = catchErrors(async (req, res, next) => {
   const body = req.body;
+
   const newProject = await project.create({
     title: body.title,
-    isFeatured: body.isFeatured,
     productImage: body.productImage,
     price: body.price,
     shortDescription: body.shortDescription,
