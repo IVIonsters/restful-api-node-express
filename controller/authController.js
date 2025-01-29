@@ -1,4 +1,4 @@
-const user = require('../db/models/user');
+const { user } = require('../db/models'); // Import user model from aggregated models
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const catchErrors = require('../utils/catchErrors');
@@ -51,7 +51,6 @@ const signup = catchErrors(async (req, res, next) => {
 
 // login controller
 const login = catchErrors(async (req, res, next) => {
-  // login logic
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -63,11 +62,10 @@ const login = catchErrors(async (req, res, next) => {
   if (!result || !(await bcrypt.compare(password, result.password))) {
     return next(new displayError('Invalid email or password', 401));
   }
+
   // generate token
-  const token = generateToken({
-    id: result.id,
-  });
-  // return token
+  const token = generateToken({ id: result.id });
+
   return res.status(200).json({
     status: 'success',
     message: 'User logged in successfully',

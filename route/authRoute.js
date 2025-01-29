@@ -3,6 +3,6 @@ const { signup, login } = require('../controller/authController'); // import sig
 
 router.route('/signup').post(signup);
 
-router.route('/login').post(login)
+router.route('/login').post(login);
 
 module.exports = router;

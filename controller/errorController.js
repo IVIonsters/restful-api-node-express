@@ -1,3 +1,5 @@
+const displayError = require('../utils/displayError'); // Import displayError
+
 // Error handling for development
 const sendErrorDev = (error, res) => {
   const statusCode = error.statusCode || 500;
@@ -17,7 +19,6 @@ const sendErrorProd = (error, res) => {
   const statusCode = error.statusCode || 500;
   const status = error.status || 'error';
   const message = error.message || 'Internal Server Error';
-  const stack = error.stack || error;
 
   if (error.isOperational) {
     return res.status(statusCode).json({
@@ -25,22 +26,21 @@ const sendErrorProd = (error, res) => {
       message,
     });
   }
-  console.log('ERROR 💥', error.name, error.message, stack)
+  console.log('ERROR 💥', error.name, error.message, error.stack);
   return res.status(statusCode).json({
     status: 'error',
     message: 'Something went wrong, very very wrong'
-  })
-
+  });
 }
 
 const globalErrorHandler = (err, req, res, next) => {
-  (err, req, res, next) => {
-    res.status(err.statusCode).json({
-      status: err.status,
-      message: err.message,
-      // cannot send error stack in production
-      stack: err.stack,
-    });
+  // validation error
+  if (err.name === 'SequelizeValidationError') {
+    err = new displayError(err.errors[0].message, 400);
+  }
+  // unique constraint error
+  if (err.name === 'SequelizeUniqueConstraintError') {
+    err = new displayError(err.errors[0].message, 400);
   }
   if (process.env.NODE_ENV === 'development') {
     return sendErrorDev(err, res);
