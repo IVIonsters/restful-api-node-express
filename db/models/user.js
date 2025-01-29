@@ -13,23 +13,79 @@ module.exports = sequelize.define('user', {
   },
   userType: {
     type: DataTypes.ENUM('0', '1', '2'),
+    allowNull: false,
+    validate: {
+      notNull: {
+        msg: 'User type is required'
+      },
+      notEmpty: {
+        msg: 'User type cannot be empty'
+      },
+    }
   },
   firstName: {
-    type: DataTypes.STRING
+    type: DataTypes.STRING,
+    allowNull: false,
+    validate: {
+      notNull: {
+        msg: 'First name is required'
+      },
+      notEmpty: {
+        msg: 'First name cannot be empty'
+      },
+    }
   },
   lastName: {
-    type: DataTypes.STRING
+    type: DataTypes.STRING,
+    allowNull: false,
+    validate: {
+      notNull: {
+        msg: 'Last name is required'
+      },
+      notEmpty: {
+        msg: 'Last name cannot be empty'
+      },
+    }
   },
   email: {
-    type: DataTypes.STRING
+    type: DataTypes.STRING,
+    allowNull: false,
+    validate: {
+      notNull: {
+        msg: 'Email is required'
+      },
+      notEmpty: {
+        msg: 'Email cannot be empty'
+      },
+      isEmail: {
+        msg: 'Invalid email address'
+      },
+    }
   },
   password: {
-    type: DataTypes.STRING
+    type: DataTypes.STRING,
+    allowNull: false,
+    validate: {
+      notNull: {
+        msg: 'Password is required'
+      },
+      notEmpty: {
+        msg: 'Password cannot be empty'
+      },
+    }
   },
   // virtual field to confirm password before saving
   confirmPassword: {
     type: DataTypes.VIRTUAL,
     set(value) {
+      // validate password length
+      if (this.password.length < 7) {
+        throw new displayError('Password must be at least 8 characters long',
+          400
+        );
+      }
+
+      // validate password confirmation
       if (value === this.password) {
         const hashPassword = bcrypt.hashSync(value, 10);
         this.setDataValue('password', hashPassword);
