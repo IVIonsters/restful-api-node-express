@@ -1,4 +1,4 @@
-const project = require('../db/models/project'); // Import project model
+const { project } = require('../db/models'); // Import project model from aggregated models
 const catchErrors = require('../utils/catchErrors'); // Import catchErrors
 
 const createProject = catchErrors(async (req, res, next) => {
@@ -14,7 +14,7 @@ const createProject = catchErrors(async (req, res, next) => {
     category: body.category,
     tags: body.tags,
     createdBy: 1,
-  })
+  });
 
   res.status(201).json({
     status: 'success',
