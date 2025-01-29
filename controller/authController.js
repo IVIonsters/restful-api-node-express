@@ -73,4 +73,19 @@ const login = catchErrors(async (req, res, next) => {
   });
 });
 
+//authenticating user
+const authentication = catchErrors(async (req, res, next) => {
+  // get token from header
+  let idToken = '';
+  if (req.headers.authorization &&
+    req.headers.authorization.startsWith('Bearer')) {
+    idToken = req.headers.authorization.split(' ')[1];
+  } else {
+    return next(new displayError('Unauthorized, You must login to proceed', 401));
+  }
+  // verify token
+  const tokenDetail = jwt.verify(idToken, process.env.JWT_SECRET);
+  // get user from db
+});
+
 module.exports = { signup, login };
