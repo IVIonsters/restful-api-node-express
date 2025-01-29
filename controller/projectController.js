@@ -3,6 +3,7 @@ const catchErrors = require('../utils/catchErrors'); // Import catchErrors
 
 const createProject = catchErrors(async (req, res, next) => {
   const body = req.body;
+  const userId = req.user.id;
 
   const newProject = await project.create({
     title: body.title,
@@ -13,7 +14,7 @@ const createProject = catchErrors(async (req, res, next) => {
     productUrl: body.productUrl,
     category: body.category,
     tags: body.tags,
-    createdBy: 1,
+    createdBy: userId,
   });
 
   res.status(201).json({
