@@ -83,9 +83,18 @@ const authentication = catchErrors(async (req, res, next) => {
   } else {
     return next(new displayError('Unauthorized, You must login to proceed', 401));
   }
+
   // verify token
   const tokenDetail = jwt.verify(idToken, process.env.JWT_SECRET);
+
   // get user from db
+  const freshUser = await user.findByPk(tokenDetail.id);
+
+  if (!freshUser) {
+    return next(new displayError('User not found', 404));
+  }
+  req.user = freshUser;
+  return next();
 });
 
-module.exports = { signup, login };
+module.exports = { signup, login, authentication };

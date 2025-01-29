@@ -34,6 +34,10 @@ const sendErrorProd = (error, res) => {
 }
 
 const globalErrorHandler = (err, req, res, next) => {
+  //Token Error
+  if (err.name === 'JsonWebTokenError') {
+    err = new displayError('Invalid token, Please login again', 401);
+  }
   // validation error
   if (err.name === 'SequelizeValidationError') {
     err = new displayError(err.errors[0].message, 400);
