@@ -113,5 +113,12 @@ module.exports = (sequelize) => {
     }
   });
 
+  User.associate = (models) => {
+    User.hasMany(models.project, {
+      foreignKey: 'createdBy',
+      as: 'projects',
+    });
+  };
+
   return User;
 };
