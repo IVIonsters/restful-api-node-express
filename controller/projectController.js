@@ -91,5 +91,21 @@ const updateProject = catchErrors(async (req, res, next) => {
 });
 
 //Delete project
+const deleteProject = catchErrors(async (req, res, next) => {
+  const userId = req.user.id;
+  const projectId = req.params.id;
+  const body = req.body;
 
-module.exports = { createProject, getProjects, getProjectById, updateProject };
+  const result = await project.findOne({ where: { id: projectId, createdBy: userId } });
+  if (!result) {
+    return next(new displayError('Invalid project id', 400));
+  }
+
+  await result.destroy();
+
+  return res.json({
+    status: 'success',
+    message: 'Project deleted successfully',
+  });
+});
+module.exports = { createProject, getProjects, getProjectById, updateProject, deleteProject };
