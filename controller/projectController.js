@@ -26,14 +26,16 @@ const createProject = catchErrors(async (req, res, next) => {
 
 // retrieve all projects
 const getProjects = catchErrors(async (req, res, next) => {
+  const userId = req.user.id;
   const result = await project.findAll({
     include: {
       model: user,
       as: 'user', // Specify the alias used in the association
     },
+    where: { createdBy: userId },
   });
 
-  res.status(200).json({
+  return res.json({
     status: 'success',
     data: result,
   });
@@ -41,7 +43,11 @@ const getProjects = catchErrors(async (req, res, next) => {
 
 // get project by id
 const getProjectById = catchErrors(async (req, res, next) => {
-  const projectId = req.params.id;
+  const projectId = parseInt(req.params.id, 10); // Ensure projectId is an integer
+  if (isNaN(projectId)) {
+    return next(new displayError('Invalid project id', 400));
+  }
+
   const result = await project.findByPk(projectId, {
     include: {
       model: user,
