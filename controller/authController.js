@@ -73,4 +73,28 @@ const login = catchErrors(async (req, res, next) => {
   });
 });
 
-module.exports = { signup, login };
+//authenticating user
+const authentication = catchErrors(async (req, res, next) => {
+  // get token from header
+  let idToken = '';
+  if (req.headers.authorization &&
+    req.headers.authorization.startsWith('Bearer')) {
+    idToken = req.headers.authorization.split(' ')[1];
+  } else {
+    return next(new displayError('Unauthorized, You must login to proceed', 401));
+  }
+
+  // verify token
+  const tokenDetail = jwt.verify(idToken, process.env.JWT_SECRET);
+
+  // get user from db
+  const freshUser = await user.findByPk(tokenDetail.id);
+
+  if (!freshUser) {
+    return next(new displayError('User not found', 404));
+  }
+  req.user = freshUser;
+  return next();
+});
+
+module.exports = { signup, login, authentication };
