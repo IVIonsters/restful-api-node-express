@@ -23,4 +23,13 @@ const createProject = catchErrors(async (req, res, next) => {
   });
 });
 
-module.exports = { createProject };
+const getProjects = catchErrors(async (req, res, next) => {
+  const result = await project.findAll();
+
+  res.status(200).json({
+    status: 'success',
+    data: result,
+  });
+});
+
+module.exports = { createProject, getProjects };
