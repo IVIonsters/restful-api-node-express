@@ -6,12 +6,12 @@ const { createProject, getProjects, getProjectById, updateProject, deleteProject
 router
   .route('/')
   .post(authentication, restrictUser('1'), createProject)
-  .get(authentication, getProjects);
+  .get(authentication, restrictUser('1'), getProjects);
 
 router.
   route('/:id')
-  .get(authentication, getProjectById)
-  .patch(authentication, updateProject)
-  .delete(authentication, deleteProject);
+  .get(authentication, restrictUser('1'), getProjectById)
+  .patch(authentication, restrictUser('1'), updateProject)
+  .delete(authentication, restrictUser('1'), deleteProject);
 
 module.exports = router;

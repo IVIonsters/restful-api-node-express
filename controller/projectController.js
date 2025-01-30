@@ -31,6 +31,7 @@ const getProjects = catchErrors(async (req, res, next) => {
     include: {
       model: user,
       as: 'user', // Specify the alias used in the association
+      where: { id: userId },
     },
     where: { createdBy: userId },
   });
