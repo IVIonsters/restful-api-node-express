@@ -63,4 +63,33 @@ const getProjectById = catchErrors(async (req, res, next) => {
   });
 });
 
-module.exports = { createProject, getProjects, getProjectById };
+// update project
+const updateProject = catchErrors(async (req, res, next) => {
+  const userId = req.user.id;
+  const projectId = req.params.id;
+  const body = req.body;
+
+  const result = await project.findOne({ where: { id: projectId, createdBy: userId } });
+  if (!result) {
+    return next(new displayError('Invalid project id', 400));
+  }
+  result.title = body.title;
+  result.productImage = body.productImage;
+  result.price
+  result.shortDescription = body.shortDescription;
+  result.description = body.description;
+  result.productUrl = body.productUrl;
+  result.category = body.category;
+  result.tags = body.tags;
+
+  const updatedResult = await result.save();
+
+  return res.json({
+    status: 'success',
+    data: updatedResult,
+  });
+});
+
+//Delete project
+
+module.exports = { createProject, getProjects, getProjectById, updateProject };
