@@ -115,7 +115,7 @@ module.exports = (sequelize) => {
       createdBy: {
         type: DataTypes.INTEGER,
         references: {
-          model: 'User',
+          model: 'user',
           key: 'id',
         },
       },
@@ -134,6 +134,13 @@ module.exports = (sequelize) => {
       modelName: 'project',
     }
   );
+
+  Project.associate = (models) => {
+    Project.belongsTo(models.user, {
+      foreignKey: 'createdBy',
+      as: 'user',
+    });
+  };
 
   return Project;
 };

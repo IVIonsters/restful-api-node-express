@@ -1,4 +1,4 @@
-const { project } = require('../db/models'); // Import project model from aggregated models
+const { project, user } = require('../db/models'); // Import project and user models from aggregated models
 const catchErrors = require('../utils/catchErrors'); // Import catchErrors
 
 const createProject = catchErrors(async (req, res, next) => {
@@ -24,7 +24,12 @@ const createProject = catchErrors(async (req, res, next) => {
 });
 
 const getProjects = catchErrors(async (req, res, next) => {
-  const result = await project.findAll();
+  const result = await project.findAll({
+    include: {
+      model: user,
+      as: 'user', // Specify the alias used in the association
+    },
+  });
 
   res.status(200).json({
     status: 'success',
